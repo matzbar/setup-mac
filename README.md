@@ -1,6 +1,6 @@
 # 🍎 setup-mac
 
-Manual e script para configurar o terminal do Mac do zero: **Homebrew, zsh com Starship, Git/GitHub por SSH, Claude Code**, Docker e VS Code.
+Manual e script para configurar o terminal do Mac do zero: **Homebrew, zsh com Starship, Git/GitHub por SSH, Claude Code e Codex**, Docker e VS Code.
 
 Tudo foi montado e verificado passo a passo em um Mac com Apple Silicon, com os retornos esperados de cada comando.
 
@@ -41,7 +41,8 @@ ASSUME_YES=1 ./setup-mac.sh
 8. Cria o `~/.config/starship.toml` com as cores do esquema Roxo, se não existir
 9. Adiciona o bloco do Starship e dos plugins ao `~/.zshrc`
 10. Instala o Claude Code, se não estiver instalado
-11. Verifica o Docker e o VS Code
+11. Instala o Codex (OpenAI) pelo Homebrew, se não estiver instalado
+12. Verifica o Docker e o VS Code
 
 O que o script **não** faz: escolher a fonte no Terminal (é manual), atualizar o Xcode e rodar `brew upgrade`.
 
@@ -55,7 +56,9 @@ O que o script **não** faz: escolher a fonte no Terminal (é manual), atualizar
 
 ## Status do teste
 
-A lógica de edição dos arquivos foi testada em ambiente isolado, com a verificação de idempotência. As etapas que dependem de um Mac real (Homebrew, `gh auth login`, Keychain, instalador do Claude Code) foram verificadas manualmente, seguindo o manual, mas **ainda não foram executadas de ponta a ponta pelo script**. Na primeira execução, acompanhe a saída.
+- **Executado de ponta a ponta** em um Mac com Apple Silicon que já estava configurado: as 12 etapas rodaram sem erro, reconheceram o que já existia e **não alteraram nada** (idempotência confirmada).
+- A lógica de edição dos arquivos (MacPorts, `starship.toml`, `~/.zshrc`, `~/.ssh/config`) também foi testada em ambiente isolado.
+- **Ainda não exercitado:** os caminhos de *instalação do zero* (instalar o Homebrew, gerar uma chave SSH nova, `gh auth login`, instalar pacotes e o Claude Code), porque neste Mac tudo já estava instalado. Num Mac novo, acompanhe a saída na primeira execução.
 
 Os exemplos de cores e caminhos usam nomes genéricos (`usuario`, `meu-projeto`).
 

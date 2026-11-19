@@ -12,7 +12,7 @@
 2. [Base do sistema](#2--base-do-sistema)
 3. [Terminal e aparência](#3--terminal-e-aparência)
 4. [Git e GitHub](#4--git-e-github)
-5. [Claude Code](#5--claude-code)
+5. [Claude Code e Codex](#5--claude-code-e-codex)
 6. [Linguagens e ferramentas](#6--linguagens-e-ferramentas)
 7. [Script de instalação automática](#7--script-de-instalação-automática)
 8. [Solução de problemas](#8--solução-de-problemas)
@@ -32,7 +32,8 @@ Ordem recomendada. Cada etapa depende da anterior.
 | 4a | Terminal: prompt simples com cores (Roxo) (3.1) | ~5 min | ✅ |
 | 4b | Terminal: visual moderno com Starship, Roxo (3.2 a 3.4) | ~10 min | ✅ |
 | 5 | Git + GitHub (SSH e `gh`) (seção 4) | ~10 min | ✅ |
-| 6 | Claude Code (seção 5) | ~5 min | ✅ |
+| 6a | Claude Code (5.1 a 5.3) | ~5 min | ✅ |
+| 6b | Codex, da OpenAI (5.4) | ~5 min | ✅ |
 | 7 | Linguagens e extras: Node, Python, Docker, VS Code (seção 6) | variável | ✅ |
 
 > 💡 **Legenda dos blocos neste manual**
@@ -49,11 +50,12 @@ Ordem recomendada. Cada etapa depende da anterior.
 | Claude Code 2.1.327 | ✅ Instalado (nativo), atualizações automáticas, `claude doctor` sem problemas |
 | Git: nome, e-mail, branch `main`, cores | ✅ Configurados |
 | `gh` 2.105.0 | ✅ Instalado |
+| Codex (OpenAI) 0.170.0 | ✅ Instalado pelo Homebrew (cask), na versão mais recente |
 | Chave SSH `id_ed25519`, `~/.ssh/config`, Keychain e login no GitHub | ✅ Configurados; `ssh -T git@github.com` autentica |
 | Prompt Roxo | Escolhido: 141 · 117 · 211 |
 | Visual moderno (Starship 1.27.0, JetBrains Mono Nerd Font, plugins) | ✅ Aplicado e funcionando (seção 3.2 a 3.4) |
 
-**Para retomar:** o manual está completo e todas as etapas foram verificadas neste Mac. Resta, opcionalmente, rodar o script da seção 7 (`setup-mac.sh`), que já foi gerado mas ainda não foi executado, e guardar uma cópia deste manual. Backups feitos até aqui: `~/.zshrc.bak`, `~/.zshrc.bak2`, `~/.zshrc.bak3`, `~/.zprofile.bak`.
+**Para retomar:** o manual está completo e todas as etapas foram verificadas neste Mac. O script da seção 7 (`setup-mac.sh`) já foi executado neste Mac e confirmou tudo, sem alterações. Resta guardar uma cópia deste manual. Backups feitos até aqui: `~/.zshrc.bak`, `~/.zshrc.bak2`, `~/.zshrc.bak3`, `~/.zprofile.bak`.
 
 ---
 
@@ -665,7 +667,7 @@ gh repo clone usuario/repositorio
 
 ---
 
-## 5. 🤖 Claude Code
+## 5. 🤖 Claude Code e Codex
 
 Assistente de código da Anthropic que roda direto no terminal.
 
@@ -758,6 +760,125 @@ claude doctor
 - Crie um arquivo `CLAUDE.md` na raiz do projeto com convenções, comandos de build/teste e contexto. O Claude lê automaticamente.
 - Use dentro de um repositório Git, assim você revisa e reverte mudanças com facilidade.
 - Comandos úteis dentro da sessão: `/help`, `/clear`, `/init` (gera um `CLAUDE.md` inicial).
+
+### 5.4 Codex (OpenAI)
+
+Assistente de código da OpenAI que roda no terminal. O método escolhido aqui é o **Homebrew (cask)**: fica junto do resto do manual, não exige Node e se atualiza com o próprio `brew`.
+
+#### Passo A: verificar se já está instalado e por qual método
+
+💻
+```bash
+command -v codex && codex --version || echo "Codex NÃO instalado"
+brew list --cask codex 2>/dev/null && echo "instalado pelo Homebrew"
+npm list -g @openai/codex --depth=0 2>/dev/null | grep codex || true
+```
+
+- Mostrou o caminho e a versão → **já instalado**. Vá para o **Passo C** e atualize **pelo mesmo método** que o instalou (o Homebrew diz `instalado pelo Homebrew`; o `npm list` mostra `@openai/codex@...`; se nenhum dos dois aparecer, foi o instalador `install.sh`).
+- Mostrou `Codex NÃO instalado` → vá para o **Passo B**.
+
+📝 **Retorno esperado (instalado):** o caminho e uma linha como `codex-cli 0.153.4` (o número muda a cada versão).
+
+✅ **Retorno real deste Mac:** `codex-cli 0.170.0`.
+
+O `brew list --cask codex` confirmou a instalação pelo Homebrew ✅:
+
+```
+codex-cli 0.170.0
+==> Binary
+/opt/homebrew/bin/codex -> /opt/homebrew/Caskroom/codex/0.170.0/bin/codex
+==> Generated Completion
+bin/codex completion (base_name: codex, shells: bash, zsh, fish)
+instalado pelo Homebrew
+```
+
+O `npm list` não mostrou nada, então não há uma segunda instalação pelo npm. O link em `/opt/homebrew/bin/codex` aponta para a versão em `Caskroom`, e é por isso que a atualização deve ser feita com `brew upgrade --cask codex` (Passo C).
+
+> 💡 Se rodar o `codex --version` **dentro de uma sessão do Codex** (pedindo para ele executar o comando), pode aparecer `WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted`. É um aviso do ambiente restrito (sandbox) em que o Codex executa comandos. No Terminal comum ele não aparece.
+
+#### Passo B: instalar (somente se não estiver instalado)
+
+💻
+```bash
+brew install --cask codex
+```
+
+✅ Foi o método usado neste Mac, e a instalação correu normalmente.
+
+Alternativas (use **uma só**, nunca duas):
+
+```bash
+# Instalador oficial (sem Node)
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+
+# npm (exige Node; o nome do pacote precisa ser exatamente este)
+npm install -g @openai/codex
+```
+
+⚠️ Não use `brew install codex` (sem `--cask`) nem `npm install -g codex`: não são o caminho documentado e podem instalar outra coisa.
+
+#### Passo C: atualizar (se já estiver instalado)
+
+💻
+```bash
+codex update
+```
+
+Se o `codex update` não existir na sua versão ou falhar, atualize pelo método de instalação:
+
+| Instalado por | Atualizar com |
+|---------------|---------------|
+| Homebrew (cask) | `brew upgrade --cask codex` |
+| npm | `npm install -g @openai/codex@latest` |
+| Instalador `install.sh` | rodar o `curl ... install.sh | sh` de novo |
+
+✅ **Retorno real deste Mac** (`brew upgrade --cask codex`):
+
+```
+Warning: Not upgrading codex, the latest version is already installed
+codex-cli 0.170.0
+```
+
+O `Warning` aqui é informativo: significa que já está na versão mais recente.
+
+#### Passo D: primeiro uso e login
+
+```bash
+cd ~/caminho/do/seu/projeto
+codex
+```
+
+Na primeira execução ele pede o login: **Sign in with ChatGPT** (abre o navegador) ou uma chave de API da OpenAI.
+
+📝 **Tela inicial real deste Mac ✅** (rodando `codex` dentro de uma pasta nova, `~/Desktop/meu-projeto-codex`):
+
+```
+>_ OpenAI Codex (v0.170.0)
+   ~/Desktop/meu-projeto-codex
+
+To get started, describe a task or try one of these commands:
+
+/init - create an AGENTS.md file with instructions for Codex
+/status - show current session configuration
+/permissions - choose what Codex is allowed to do
+/model - choose what model and reasoning effort to use
+/review - review any changes and find issues
+```
+
+| Comando | Para que serve |
+|---------|----------------|
+| `/init` | Cria o `AGENTS.md`, o arquivo de instruções do projeto (equivalente ao `CLAUDE.md` do Claude Code) |
+| `/status` | Mostra a configuração da sessão |
+| `/permissions` | Define o que o Codex pode fazer sozinho |
+| `/model` | Escolhe o modelo e o esforço de raciocínio |
+| `/review` | Revisa as mudanças e procura problemas |
+
+✅ Verificar:
+```bash
+codex --version
+```
+
+⚠️ Se aparecer `command not found: codex` depois de instalar, abra uma **nova janela** do Terminal. Persistindo, reinstale: `brew uninstall --cask codex && brew install --cask codex`.
 
 ---
 
@@ -901,14 +1022,17 @@ ASSUME_YES=1 ./setup-mac.sh
 | 8. Starship | 3.3 | Cria o `starship.toml` com as cores do Roxo, **só se o arquivo não existir** |
 | 9. `~/.zshrc` | 3.3 | Remove o bloco do prompt simples, se houver, e adiciona o bloco do Starship e dos plugins |
 | 10. Claude Code | 5.1 | Instala pelo instalador oficial, se não estiver instalado |
-| 11. Docker e VS Code | 6.2, 6.3 | Só verifica o Docker (não instala sozinho). Instala o VS Code se não achar o app nem o comando `code` |
+| 11. Codex | 5.4 | Instala pelo Homebrew (`brew install --cask codex`), se não estiver instalado |
+| 12. Docker e VS Code | 6.2, 6.3 | Só verifica o Docker (não instala sozinho). Instala o VS Code se não achar o app nem o comando `code` |
 
 ⚠️ **O que o script não faz sozinho**
 - Escolher a fonte no Terminal (**Ajustes → Perfis → Texto → Fonte**). É uma configuração manual.
 - Atualizar o Xcode (seção 2.3) e rodar `brew upgrade`. Fazem parte da manutenção, não da instalação.
 - Instalar Node, Python ou um gerenciador de versões (seção 6), nem o Docker Desktop.
 
-> 📝 **Status do teste:** a lógica de edição dos arquivos (MacPorts, `starship.toml`, `~/.zshrc`, `~/.ssh/config`) foi testada em um ambiente isolado e confirmou a idempotência. As etapas que dependem do seu Mac (Homebrew, `gh auth login`, Keychain, instalador do Claude Code) **ainda não foram executadas pelo script**. Na primeira execução, acompanhe a saída e, em caso de dúvida, volte ao passo a passo manual.
+> 📝 **Status do teste:** o script foi **executado de ponta a ponta** em um Mac Apple Silicon já configurado. As 12 etapas terminaram com `✓`, reconheceram o que existia (Homebrew, pacotes, chave SSH, `gh`, Starship, Claude Code, Codex, Docker e VS Code) e **não alteraram nada**. A lógica de edição dos arquivos também foi testada em ambiente isolado.
+>
+> **Ainda não exercitado:** os caminhos de *instalação do zero* (instalar o Homebrew, gerar uma chave SSH, `gh auth login`, instalar pacotes e o Claude Code), porque neste Mac tudo já existia. Num Mac novo, acompanhe a saída e, em caso de dúvida, volte ao passo a passo manual.
 
 ---
 
@@ -920,6 +1044,7 @@ ASSUME_YES=1 ./setup-mac.sh
 | `Permission denied (publickey)` | Chave SSH não cadastrada | `gh ssh-key add ~/.ssh/id_ed25519.pub` |
 | Ícones quebrados no prompt | Fonte não é Nerd Font | Revisar seção 3.1 |
 | `claude: command not found` | PATH do instalador | Abrir novo terminal ou `source ~/.zshrc` |
+| `WARNING: ... could not create PATH aliases: Operation not permitted` | Aviso do sandbox do Codex ao rodar comandos dentro da sessão | Ignorar; no Terminal comum não aparece (ver 5.4) |
 | `which -a git` mostra `/opt/local/bin/git` primeiro | MacPorts na frente do Homebrew no PATH | Ver seção 8.1 |
 | `port`: `OS platform mismatch` | MacPorts instalado antes de uma atualização grande do macOS | Ver seção 8.1 |
 

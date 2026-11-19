@@ -25,7 +25,8 @@
 #   8. Cria o ~/.config/starship.toml (cores do esquema Roxo), se não existir
 #   9. Adiciona o bloco do Starship e dos plugins ao ~/.zshrc
 #  10. Instala o Claude Code, se não estiver instalado
-#  11. Verifica o Docker e o VS Code (instala só o VS Code, se faltar)
+#  11. Instala o Codex (OpenAI) pelo Homebrew, se não estiver instalado
+#  12. Verifica o Docker e o VS Code (instala só o VS Code, se faltar)
 
 set -euo pipefail
 
@@ -304,8 +305,19 @@ step_claude() {
   fi
 }
 
+step_codex() {
+  info "11. Codex (OpenAI)"
+  if command -v codex >/dev/null 2>&1; then
+    ok "Codex já instalado: $(codex --version 2>/dev/null | head -n1)"
+    warn "Para atualizar: codex update (ou brew upgrade --cask codex)"
+  else
+    info "Instalando o Codex (Homebrew cask)"
+    brew install --cask codex
+  fi
+}
+
 step_extras() {
-  info "11. Docker e VS Code"
+  info "12. Docker e VS Code"
   if command -v docker >/dev/null 2>&1 || [[ -d "/Applications/Docker.app" ]]; then
     ok "Docker encontrado"
   else
@@ -336,7 +348,7 @@ summary() {
 }
 
 usage() {
-  sed -n '2,28p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+  sed -n '2,29p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
 main() {
@@ -356,6 +368,7 @@ main() {
   step_starship_config
   step_zshrc
   step_claude
+  step_codex
   step_extras
   summary
 }
